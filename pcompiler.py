@@ -12,7 +12,8 @@ def main():
             file_buffer = iter(file.read().replace('\t', ''))
             file.close()
 
-            lexical_analyzer(file_buffer)   # talvez tem q fazer surround
+            tokens = lexical_analyzer(file_buffer)   # talvez tem q fazer surround
+            print(tokens)
             # syntactic analyzer
         except IOError:
             print(f'{filename}: file not found!!')
