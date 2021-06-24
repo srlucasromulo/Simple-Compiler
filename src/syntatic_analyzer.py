@@ -1,5 +1,5 @@
 i = 0
-tok_vetor = ['PROGRAM', 'ID', 'PCOMA','VAR', 'ID', 'DPO', 'INTEGER', 'PCOMA', 'VAR', 'ID', 'DPO', 'INTEGER', 'PCOMA']
+tok_vetor = ['PROGRAM', 'ID', 'PCOMA','VAR', 'ID', 'DPO', 'INTEGER', 'PCOMA', 'BEGIN', 'ID', 'RECE', 'real_const', 'PCOMA', 'IF', 'ID', 'THEN', 'ID', 'RECE', 'ID', 'SUB', 'ID', 'PCOMA', 'END', 'END']
 token = tok_vetor[i]
 
 def match(tok):
@@ -100,7 +100,8 @@ def Expr():
 def ExprOpc():
     OpIgual()
     Rel()
-#     ExprOpc()
+    if(token == 'IGUAL' or token == 'DIF' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+        ExprOpc()
 
 def OpIgual():
     if(token == 'IGUAL'):
@@ -115,7 +116,8 @@ def Rel():
 def RelOpc():
     OpRel()
     Adicao()
-#     RelOpc()
+    if(token == 'MENOR' or token == 'MAIOR' or token == 'MENORE' or token == 'MAIORE' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+        RelOpc()
 
 def OpRel():
     if(token == 'MENOR'):
@@ -134,7 +136,8 @@ def Adicao():
 def AdicaoOpc():
     OpAdicao()
     Termo()
-#     AdicaoOpc()
+    if(token == 'PLUS' or token == 'SUB' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+        AdicaoOpc()
 
 def OpAdicao():
     if(token == 'PLUS'):
@@ -149,7 +152,8 @@ def Termo():
 def TermoOpc():
     OpMult()
     Fator()
-#     TermoOpc()
+    if(token == 'MULT' or token == 'DIV' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+        TermoOpc()
 
 def OpMult():
     if(token == 'MULT'):
