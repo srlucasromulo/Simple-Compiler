@@ -108,7 +108,7 @@ def lexical_analyzer(file: iter):
 
         if re.findall('[a-zA-Z]', c):
             string = ''
-            while re.findall('[a-zA-Z_]', c):
+            while re.findall('[a-zA-Z_0-9]', c):
                 string += c
                 c = get_c()
             if string in keywords:

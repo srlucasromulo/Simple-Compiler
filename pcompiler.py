@@ -14,6 +14,7 @@ def main():
             file.close()
 
             tokens = lexical_analyzer(file_buffer)   # talvez tem q fazer surround
+            # print(tokens)
             syntatic_analyzer(tokens)
         except IOError:
             print(f'{filename}: file not found!!')
