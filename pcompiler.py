@@ -1,5 +1,6 @@
 import sys
 from src.lexical_analyzer import lexical_analyzer
+from src.syntatic_analyzer import syntatic_analyzer
 
 
 def main():
@@ -13,8 +14,7 @@ def main():
             file.close()
 
             tokens = lexical_analyzer(file_buffer)   # talvez tem q fazer surround
-            print(tokens)
-            # syntactic analyzer
+            syntatic_analyzer(tokens)
         except IOError:
             print(f'{filename}: file not found!!')
 
