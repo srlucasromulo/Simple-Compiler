@@ -103,7 +103,7 @@ def lexical_analyzer(file: iter):
         if c == '!':
             c = get_c()
             if c == '=':
-                tokens.append(('==', 'NEQUAL', line_index))
+                tokens.append(('!=', 'NEQUAL', line_index))
                 c = get_c()
 
         if re.findall('[a-zA-Z]', c):
@@ -122,7 +122,7 @@ def lexical_analyzer(file: iter):
             while c != '"':
                 string += c
                 c = get_c()
-            tokens.append((string, 'STR_CONST', line_index))
+            tokens.append((string, 'STRING_LITERAL', line_index))
             c = get_c()
 
         if re.findall('[0-9]', c):
