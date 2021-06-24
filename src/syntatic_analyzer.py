@@ -1,6 +1,5 @@
 i = 0
-tok_vetor = ['PROGRAM', 'ID', 'PCOMA','VAR', 'ID', 'DPO', 'INTEGER', 'PCOMA', 'BEGIN', 'ID', 'RECE', 'real_const', 'PCOMA', 'IF', 'ID', 'THEN', 'ID', 'RECE', 'ID', 'SUB', 'ID', 'PCOMA', 'END', 'END']
-token = tok_vetor[i]
+tok_vetor = []
 
 def match(tok):
     global token, i
@@ -10,12 +9,16 @@ def match(tok):
         if(i < len(tok_vetor)):
             token = tok_vetor[i]
     else:
-        print("Error")
+        Error()
+
+def Error():
+    global token, i
+    print("Erro sintático. Token " + token + " não esperado")
 
 def Programa():
     match('PROGRAM')
     match('ID')
-    match('PCOMA')
+    match('PCOMMA')
     Bloco()
 
 def Bloco():
@@ -32,20 +35,20 @@ def DeclaracaoSeq():
 def Declaracao():
     match('VAR')
     VarList()
-    match('DPO')
+    match('TWOP')
     Type()
-    match('PCOMA')
+    match('PCOMMA')
 
 def VarList():
     if(token == 'ID'):
         Fator()
         VarList2()
     else:
-        print("Error")
+        Error()
 
 def VarList2():
-    if(token == 'COMA'):
-        match('COMA')
+    if(token == 'COMMA'):
+        match('COMMA')
         Fator()
         VarList2()
 
@@ -58,6 +61,8 @@ def Type():
         match('REAL')
     elif(token == 'STRING'):
         match('STRING')
+    else:
+        Error()
 
 def ComandoSeq():
     Comando()
@@ -67,9 +72,9 @@ def ComandoSeq():
 def Comando():
     if(token == 'ID'):
         Fator()
-        match('RECE')
+        match('ATTR')
         Expr()
-        match('PCOMA')
+        match('PCOMMA')
     elif(token == 'IF'):
         match('IF')
         Expr()
@@ -85,13 +90,11 @@ def Comando():
     elif(token == 'PRINT'):
         match('PRINT')
         Expr()
-        match('PCOMA')
+        match('PCOMMA')
     elif(token == 'READ'):
         match('READ')
         Fator()
-        match('PCOMA')
-    else:
-        print("Error")
+        match('PCOMMA')
 
 def Expr():
     Rel()
@@ -100,14 +103,14 @@ def Expr():
 def ExprOpc():
     OpIgual()
     Rel()
-    if(token == 'IGUAL' or token == 'DIF' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+    if(token == 'EQUAL' or token == 'NEQUAL' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
         ExprOpc()
 
 def OpIgual():
-    if(token == 'IGUAL'):
-        match('IGUAL')
-    elif(token == 'DIF'):
-        match('DIF')
+    if(token == 'EQUAL'):
+        match('EQUAL')
+    elif(token == 'NEQUAL'):
+        match('NEQUAL')
 
 def Rel():
     Adicao()
@@ -116,18 +119,18 @@ def Rel():
 def RelOpc():
     OpRel()
     Adicao()
-    if(token == 'MENOR' or token == 'MAIOR' or token == 'MENORE' or token == 'MAIORE' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+    if(token == 'LT' or token == 'GT' or token == 'LE' or token == 'GE' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
         RelOpc()
 
 def OpRel():
-    if(token == 'MENOR'):
-        match('MENOR')
-    elif(token == 'MAIORE'):
-        match('MAIORE')
-    elif(token == 'MENORE'):
-        match('MENORE')
-    elif(token == 'MAIOR'):
-        match('MAIOR')
+    if(token == 'LT'):
+        match('LT')
+    elif(token == 'GE'):
+        match('GE')
+    elif(token == 'LE'):
+        match('LE')
+    elif(token == 'GT'):
+        match('GT')
 
 def Adicao():
     Termo()
@@ -136,14 +139,14 @@ def Adicao():
 def AdicaoOpc():
     OpAdicao()
     Termo()
-    if(token == 'PLUS' or token == 'SUB' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+    if(token == 'PLUS' or token == 'MINUS' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
         AdicaoOpc()
 
 def OpAdicao():
     if(token == 'PLUS'):
         match('PLUS')
-    elif(token == 'SUB'):
-        match('SUB')
+    elif(token == 'MINUS'):
+        match('MINUS')
 
 def Termo():
     Fator()
@@ -152,7 +155,7 @@ def Termo():
 def TermoOpc():
     OpMult()
     Fator()
-    if(token == 'MULT' or token == 'DIV' or token == 'ID' or token == 'integer_const' or token == 'real_const'):
+    if(token == 'MULT' or token == 'DIV' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
         TermoOpc()
 
 def OpMult():
@@ -164,10 +167,10 @@ def OpMult():
 def Fator():
     if(token == 'ID'):
         match('ID')
-    elif(token == 'integer_const'):
-        match('integer_const')
-    elif(token == 'real_const'):
-        match('real_const')
+    elif(token == 'INT_CONST'):
+        match('INT_CONST')
+    elif(token == 'REAL_CONST'):
+        match('REAL_CONST')
     elif(token == 'TRUE'):
         match('TRUE')
     elif(token == 'FALSE'):
@@ -179,4 +182,9 @@ def Fator():
         Expr()
         match('RBRACKET')
 
-Programa()
+def syntatic_analyzer(toke):
+    global token, i
+    for j in range(0, len(toke)):
+        tok_vetor.append(toke[j][1])
+    token = tok_vetor[i]
+    Programa()
