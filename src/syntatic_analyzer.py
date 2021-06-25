@@ -26,6 +26,7 @@ def Bloco():
     match('BEGIN')
     ComandoSeq()
     match('END')
+    match('EOF')
 
 def DeclaracaoSeq():
     Declaracao()
