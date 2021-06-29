@@ -10,6 +10,7 @@ buffer = [None]
 
 log_file = './logs/lexical.log'
 
+
 def get_c():
     try:
         # noinspection PyUnresolvedReferences
@@ -37,11 +38,12 @@ def lexical_analyzer(file: iter, filename):
             break
 
         if not re.findall(sigma, c):
-            log.write(f'- Char {c} found in line {line_index} doesnt belong to Sigma\n')
+            log.write(f'[{datetime.now().strftime("%X")}] '
+                      f'Char {c} found in line {line_index} doesnt belong to Sigma\n')
             c = get_c()
             errors += 1
 
-        if c == ' ':
+        if c == ' ' or c == '\t':
             c = get_c()
 
         if c == '\n':
@@ -109,12 +111,20 @@ def lexical_analyzer(file: iter, filename):
             if c == '=':
                 tokens.append(('==', 'EQUAL', line_index))
                 c = get_c()
+            else:
+                log.write(f'[{datetime.now().strftime("%X")}] '
+                          f'Expected =. Found {c} instead\n')
+                errors += 1
 
         if c == '!':
             c = get_c()
             if c == '=':
                 tokens.append(('!=', 'NEQUAL', line_index))
                 c = get_c()
+            else:
+                log.write(f'[{datetime.now().strftime("%X")}] '
+                          f'Expected =. Found {c} instead\n')
+                errors += 1
 
         # id tokens
         if re.findall('[a-zA-Z]', c):
@@ -156,8 +166,8 @@ def lexical_analyzer(file: iter, filename):
     tokens.append(('EOF', 'EOF', line_index))
 
     log.write('--------------------------------------------------------\n')
-    log.write(f'Erros found in code {filename}: {errors}\n')
-    log.write(f'Lexical analyzer fineshed at: {datetime.now().strftime("%A %x %X")}\n')
+    log.write(f'Errors found in code {filename}: {errors}\n')
+    log.write(f'Lexical analyzer finished at: {datetime.now().strftime("%A %x %X")}\n')
     log.write('--------------------------------------------------------\n\n')
     log.close()
 

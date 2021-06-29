@@ -20,7 +20,7 @@ def main():
     for filename in args:
         try:
             file = open(src_codes + filename, 'r')
-            file_buffer = iter(file.read().replace('\t', ''))
+            file_buffer = iter(file.read())
             file.close()
 
             tokens = lexical_analyzer(file_buffer, filename)
