@@ -1,10 +1,19 @@
+from datetime import datetime
+
 i = 0
 tok_vetor = []
+SymbolTable = []
+varSymbol = []
+variavel = None
+
+log_file = './logs/syntatic.log'
+log = None
+errors = 0
 
 def match(tok):
     global token, i
-    if(token == tok):
-        print("match " + token)
+    if(token[1] == tok):
+        print("match " + token[1])
         i = i + 1
         if(i < len(tok_vetor)):
             token = tok_vetor[i]
@@ -12,8 +21,10 @@ def match(tok):
         Error()
 
 def Error():
-    global token, i
-    print("Erro sintático. Token " + token + " não esperado")
+    global token, i, errors, log
+    log.write(f'[{datetime.now().strftime("%X")}] '
+                          f'Syntatic Error. Token {token[1]} unexpected\n')
+    errors += 1
 
 def Programa():
     match('PROGRAM')
@@ -30,7 +41,7 @@ def Bloco():
 
 def DeclaracaoSeq():
     Declaracao()
-    if(token == 'VAR'):
+    if(token[1] == 'VAR'):
         DeclaracaoSeq()
 
 def Declaracao():
@@ -41,58 +52,101 @@ def Declaracao():
     match('PCOMMA')
 
 def VarList():
-    if(token == 'ID'):
+    global errors, log
+    if(token[1] == 'ID'):
+        flag = False
+        for i in range(0, len(SymbolTable)):
+            if(token[0] in SymbolTable[i][0]):
+                flag = True
+        if(not flag):
+            varSymbol.append(token)
+        else:
+            log.write(f'[{datetime.now().strftime("%X")}] '
+                          f'Semantic Error. {token[0]} already declared: line {token[2]}\n')
+            errors += 1
         Fator()
         VarList2()
     else:
         Error()
 
 def VarList2():
-    if(token == 'COMMA'):
+    global errors,log
+    if(token[1] == 'COMMA'):
         match('COMMA')
+        flag = False
+        for i in range(0, len(SymbolTable)):
+            if(token[0] in SymbolTable[i][0]):
+                flag = True
+        if(not flag):
+            varSymbol.append(token)
+        else:
+            log.write(f'[{datetime.now().strftime("%X")}] '
+                          f'Semantic Error. {token[0]} already declared: line {token[2]}\n')
+            errors += 1
         Fator()
         VarList2()
 
 def Type():
-    if(token == 'BOOLEAN'):
+    if(token[1] == 'BOOLEAN'):
+        for i in varSymbol:
+            SymbolTable.append((i[0], token[1]))
+        varSymbol.clear()
         match('BOOLEAN')
-    elif(token == 'INTEGER'):
+    elif(token[1] == 'INTEGER'):
+        for i in varSymbol:
+            SymbolTable.append((i[0], token[1]))
+        varSymbol.clear()
         match('INTEGER')
-    elif(token == 'REAL'):
+    elif(token[1] == 'REAL'):
+        for i in varSymbol:
+            SymbolTable.append((i[0], token[1]))
+        varSymbol.clear()
         match('REAL')
-    elif(token == 'STRING'):
+    elif(token[1] == 'STRING'):
+        for i in varSymbol:
+            SymbolTable.append((i[0], token[1]))
+        varSymbol.clear()
         match('STRING')
     else:
         Error()
 
 def ComandoSeq():
     Comando()
-    if(token == 'ID' or token == 'IF' or token == 'WHILE' or token == 'PRINT' or token == 'READ'):
+    if(token[1] == 'ID' or token[1] == 'IF' or token[1] == 'WHILE' or token[1] == 'PRINT' or token[1] == 'READ'):
         ComandoSeq()
 
 def Comando():
-    if(token == 'ID'):
+    global variavel, errors,log
+    if(token[1] == 'ID'):
+        variavel = None
+        for i in range(0, len(SymbolTable)):
+            if(token[0] in SymbolTable[i][0]):
+                variavel = SymbolTable[i]
+        if(not variavel):
+            log.write(f'[{datetime.now().strftime("%X")}] '
+                          f'Semantic Error. {token[0]} not declared: line {token[2]}\n')
+            errors += 1
         Fator()
         match('ATTR')
         Expr()
         match('PCOMMA')
-    elif(token == 'IF'):
+    elif(token[1] == 'IF'):
         match('IF')
         Expr()
         match('THEN')
         ComandoSeq()
         match('END')
-    elif(token == 'WHILE'):
+    elif(token[1] == 'WHILE'):
         match('WHILE')
         Expr()
         match('DO')
         ComandoSeq()
         match('END')
-    elif(token == 'PRINT'):
+    elif(token[1] == 'PRINT'):
         match('PRINT')
         Expr()
         match('PCOMMA')
-    elif(token == 'READ'):
+    elif(token[1] == 'READ'):
         match('READ')
         Fator()
         match('PCOMMA')
@@ -104,13 +158,13 @@ def Expr():
 def ExprOpc():
     OpIgual()
     Rel()
-    if(token == 'EQUAL' or token == 'NEQUAL' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
+    if(token[1] == 'EQUAL' or token[1] == 'NEQUAL' or token[1] == 'ID' or token[1] == 'INT_CONST' or token[1] == 'REAL_CONST'):
         ExprOpc()
 
 def OpIgual():
-    if(token == 'EQUAL'):
+    if(token[1] == 'EQUAL'):
         match('EQUAL')
-    elif(token == 'NEQUAL'):
+    elif(token[1] == 'NEQUAL'):
         match('NEQUAL')
 
 def Rel():
@@ -120,17 +174,17 @@ def Rel():
 def RelOpc():
     OpRel()
     Adicao()
-    if(token == 'LT' or token == 'GT' or token == 'LE' or token == 'GE' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
+    if(token[1] == 'LT' or token[1] == 'GT' or token[1] == 'LE' or token[1] == 'GE' or token[1] == 'ID' or token[1] == 'INT_CONST' or token[1] == 'REAL_CONST'):
         RelOpc()
 
 def OpRel():
-    if(token == 'LT'):
+    if(token[1] == 'LT'):
         match('LT')
-    elif(token == 'GE'):
+    elif(token[1] == 'GE'):
         match('GE')
-    elif(token == 'LE'):
+    elif(token[1] == 'LE'):
         match('LE')
-    elif(token == 'GT'):
+    elif(token[1] == 'GT'):
         match('GT')
 
 def Adicao():
@@ -140,13 +194,13 @@ def Adicao():
 def AdicaoOpc():
     OpAdicao()
     Termo()
-    if(token == 'PLUS' or token == 'MINUS' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
+    if(token[1] == 'PLUS' or token[1] == 'MINUS' or token[1] == 'ID' or token[1] == 'INT_CONST' or token[1] == 'REAL_CONST'):
         AdicaoOpc()
 
 def OpAdicao():
-    if(token == 'PLUS'):
+    if(token[1] == 'PLUS'):
         match('PLUS')
-    elif(token == 'MINUS'):
+    elif(token[1] == 'MINUS'):
         match('MINUS')
 
 def Termo():
@@ -156,36 +210,47 @@ def Termo():
 def TermoOpc():
     OpMult()
     Fator()
-    if(token == 'MULT' or token == 'DIV' or token == 'ID' or token == 'INT_CONST' or token == 'REAL_CONST'):
+    if(token[1] == 'MULT' or token[1] == 'DIV' or token[1] == 'ID' or token[1] == 'INT_CONST' or token[1] == 'REAL_CONST'):
         TermoOpc()
 
 def OpMult():
-    if(token == 'MULT'):
+    if(token[1] == 'MULT'):
         match('MULT')
-    elif(token == 'DIV'):
+    elif(token[1] == 'DIV'):
         match('DIV')
 
 def Fator():
-    if(token == 'ID'):
+    if(token[1] == 'ID'):
         match('ID')
-    elif(token == 'INT_CONST'):
+    elif(token[1] == 'INT_CONST'):
         match('INT_CONST')
-    elif(token == 'REAL_CONST'):
+    elif(token[1] == 'REAL_CONST'):
         match('REAL_CONST')
-    elif(token == 'TRUE'):
+    elif(token[1] == 'TRUE'):
         match('TRUE')
-    elif(token == 'FALSE'):
+    elif(token[1] == 'FALSE'):
         match('FALSE')
-    elif(token == 'STRING_LITERAL'):
+    elif(token[1] == 'STRING_LITERAL'):
         match('STRING_LITERAL')
-    elif(token == 'LBRACKET'):
+    elif(token[1] == 'LBRACKET'):
         match('LBRACKET')
         Expr()
         match('RBRACKET')
 
-def syntatic_analyzer(toke):
-    global token, i
-    for j in range(0, len(toke)):
-        tok_vetor.append(toke[j][1])
+def syntatic_analyzer(toke, filename):
+    global token, i, tok_vetor,log
+    
+    log = open(log_file, 'a')
+    log.write('\n--------------------------------------------------------\n')
+    log.write(f'Error log from code {filename}\n')
+    log.write(f'Syntatic analyzer started at: {datetime.now().strftime("%A %x %X")}\n')
+    log.write('--------------------------------------------------------\n')
+    tok_vetor = toke
     token = tok_vetor[i]
     Programa()
+    log.write('--------------------------------------------------------\n')
+    log.write(f'Errors found in code {filename}: {errors}\n')
+    log.write(f'Syntatic analyzer finished at: {datetime.now().strftime("%A %x %X")}\n')
+    log.write('--------------------------------------------------------\n\n')
+    log.close()
+    i = 0
