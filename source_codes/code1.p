@@ -1,7 +1,7 @@
 program calc;
 	var x,y,z: real;
-	var nome, endereco: string;
-	begin 
+	var nome, endereco: ;
+	begin
 		x := 3.15;
 		y := 2.4;
 		if x then

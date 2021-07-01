@@ -3,7 +3,6 @@ import os
 from src.lexical_analyzer import lexical_analyzer
 from src.syntatic_analyzer import syntatic_analyzer
 
-
 def clear_logs():
     if not os.path.exists('./logs'):
         os.mkdir('./logs')

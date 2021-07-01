@@ -10,6 +10,36 @@ log_file = './logs/syntatic.log'
 log = None
 errors = 0
 
+follow = {}
+follow['PROGRAM'] = ['ID']
+follow['BEGIN'] = ['ID', 'EOF', 'PRINT', 'READ', 'END']
+follow['VAR'] = ['ID']
+follow['TWOP'] = ['BOOLEAN', 'INTEGER', 'REAL', 'STRING']
+follow['COMMA'] = ['ID']
+follow['LBRACKET'] = ['ID', 'REAL_CONST', 'INT_CONST', 'STRING_LITERAL']
+follow['REAL_CONST'] = ['PCOMMA', 'PLUS', 'MULT', 'DIV', 'MINUS', 'EQUAL', 'ATTR', 'NEQUAL', 'GT', 'GE', 'LT', 'LE']
+follow['PLUS'] = follow['REAL_CONST']
+follow['MULT'] = follow['REAL_CONST']
+follow['DIV'] = follow['REAL_CONST']
+follow['MINUS'] = follow['REAL_CONST']
+follow['EQUAL'] = follow['REAL_CONST']
+follow['NEQUAL'] = follow['REAL_CONST']
+follow['ATTR'] = follow['REAL_CONST']
+follow['GT'] = follow['REAL_CONST']
+follow['GE'] = follow['REAL_CONST']
+follow['LT'] = follow['REAL_CONST']
+follow['LE'] = follow['REAL_CONST']
+follow['INT_CONST'] = follow['REAL_CONST']
+follow['STRING_LITERAL'] = ['ID', 'PCOMMA']
+follow['IF'] = ['LBRACKET', 'TRUE', 'FALSE'] + follow['LBRACKET'] + ['RBRACKET']
+follow['THEN'] = ['ID', 'END', 'PRINT', 'READ']
+follow['WHILE'] = ['LBRACKET', 'TRUE', 'FALSE'] + follow['LBRACKET'] + ['RBRACKET']
+follow['DO'] = ['LBRACKET', 'ID', 'END', 'RBRACKET'] + follow['LBRACKET']
+follow['PRINT'] = follow['LBRACKET'] + ['RBRACKET']
+follow['READ'] = follow['LBRACKET'] + ['RBRACKET']
+follow['ID'] = ['COMMA'] + follow['REAL_CONST']
+
+
 def match(tok):
     global token, i
     if(token[1] == tok):
@@ -22,8 +52,9 @@ def match(tok):
 
 def Error():
     global token, i, errors, log
+    erro = tok_vetor[i - 1]
     log.write(f'[{datetime.now().strftime("%X")}] '
-                          f'Syntatic Error. Token {token[1]} unexpected\n')
+                          f'Syntatic Error. line {token[2]} - Token {token[1]} unexpected. Some down:\n{follow[erro[1]]} expected\n')
     errors += 1
 
 def Programa():
@@ -62,7 +93,7 @@ def VarList():
             varSymbol.append(token)
         else:
             log.write(f'[{datetime.now().strftime("%X")}] '
-                          f'Semantic Error. {token[0]} already declared: line {token[2]}\n')
+                          f'Semantic Error. {token[0]} already declared: line c\n')
             errors += 1
         Fator()
         VarList2()
