@@ -1,4 +1,5 @@
 from datetime import datetime
+from os import error
 
 i = 0
 tok_vetor = []
@@ -52,9 +53,12 @@ def match(tok):
 
 def Error():
     global token, i, errors, log
-    erro = tok_vetor[i - 1]
+    if i != 0:
+        erro = tok_vetor[i - 1]
+    else:
+        erro = tok_vetor[i]
     log.write(f'[{datetime.now().strftime("%X")}] '
-                          f'Syntatic Error. line {token[2]} - Token {token[1]} unexpected. Some down:\n{follow[erro[1]]} expected\n')
+                          f'Syntatic Error. line {token[2]} - Token {token[1]} unexpected.\n')
     errors += 1
 
 def Programa():

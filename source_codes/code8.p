@@ -1,6 +1,6 @@
 program calc;
 	var x,y,z: real;
-	var nome, endereco: string;
+	var x, endereco: string;
 	begin
 		x := 3.15;
 		y := 2.4;

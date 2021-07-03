@@ -1,4 +1,4 @@
-program calc;
+program calc
 	var x,y,z: real;
 	var nome, endereco: string;
 	begin
